@@ -2,6 +2,7 @@ const webpack = require('webpack');
 const path = require('path');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
 const ExtractTextWebpackPlugin = require('extract-text-webpack-plugin');
+const WebpackShellPlugin = require('webpack-shell-plugin');
 // const CleanWebpackPlugin = require("clean-webpack-plugin");
 const utils = require('./utils');
 
@@ -114,6 +115,10 @@ const makeWebpack = (options) => {
       new webpack.BannerPlugin('前端开发'),
       new webpack.DefinePlugin({
         __ENV__: JSON.stringify(process.env.NODE_ENV)
+      }),
+      new WebpackShellPlugin({
+        onBuildStart: ['echo "Starting"'],
+        onBuildEnd: ['echo "end"']
       })
     ].concat(pages),
     resolve: {
