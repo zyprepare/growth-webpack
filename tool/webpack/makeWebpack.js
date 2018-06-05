@@ -3,7 +3,7 @@ const path = require('path');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
 const ExtractTextWebpackPlugin = require('extract-text-webpack-plugin');
 const WebpackShellPlugin = require('webpack-shell-plugin');
-// const CleanWebpackPlugin = require("clean-webpack-plugin");
+const MiniCssExtractPlugin = require("mini-css-extract-plugin");
 const utils = require('./utils');
 
 // 是否是生产环境
@@ -41,38 +41,36 @@ const makeWebpack = (options) => {
         {
           test: /\.scss$/,
           exclude: /node_modules/,
-          use: ExtractTextWebpackPlugin.extract({
-            // fallback: "style-loader",
-            use: [
-              {
-                loader: 'css-loader',
-                options: {
-                  importLoaders: 1,
-                }
-              },
-              {
-                loader: 'postcss-loader',
-                options: {
-                  plugins: () => [
-                    require('autoprefixer')
-                  ]
-                }
-              },
-              {
-                loader: 'sass-loader'
-              },
-              // {
-              //   loader: 'postcss-loader',
-              //   options: {
-              //     plugins: () => [
-              //       require('autoprefixer'),
-              //       require('precss'),
-              //       require('postcss-flexbugs-fixes')
-              //     ]
-              //   }
-              // }
-            ]
-          }),
+          use: [
+            MiniCssExtractPlugin.loader,
+            {
+              loader: 'css-loader',
+              options: {
+                importLoaders: 1,
+              }
+            },
+            {
+              loader: 'postcss-loader',
+              options: {
+                plugins: () => [
+                  require('autoprefixer')
+                ]
+              }
+            },
+            {
+              loader: 'sass-loader'
+            },
+            // {
+            //   loader: 'postcss-loader',
+            //   options: {
+            //     plugins: () => [
+            //       require('autoprefixer'),
+            //       require('precss'),
+            //       require('postcss-flexbugs-fixes')
+            //     ]
+            //   }
+            // }
+          ],
         },
         {
           test: [/\.gif$/, /\.jpe?g$/, /\.png$/],
@@ -111,7 +109,10 @@ const makeWebpack = (options) => {
       }
     },
     plugins: [
-      new ExtractTextWebpackPlugin("[name].css?v=[chunkhash:8]"),
+      new MiniCssExtractPlugin({
+        filename: "[name].css?v=[chunkhash:8]",
+        chunkFilename: "[id].css"
+      }),
       new webpack.BannerPlugin('前端开发'),
       new webpack.DefinePlugin({
         __ENV__: JSON.stringify(process.env.NODE_ENV)
