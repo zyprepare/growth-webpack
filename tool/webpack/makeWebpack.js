@@ -92,8 +92,8 @@ const makeWebpack = (options) => {
       splitChunks: {
         cacheGroups: {
           vendor: {
-            test: /node_modules\//,
-            chunks: "initial",
+            test: /[\\/]node_modules[\\/]/,
+            chunks: "all",
             name: "vendor",
             priority: 10,
             enforce: true
