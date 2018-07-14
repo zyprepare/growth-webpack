@@ -1,4 +1,4 @@
 const webpack = require('webpack');
-const makeWebpack = require('./tool/webpack/makeWebpack');
+const makeWebpack = require('basewebpack');
 
 module.exports = makeWebpack();

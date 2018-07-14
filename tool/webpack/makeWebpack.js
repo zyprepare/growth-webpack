@@ -10,14 +10,14 @@ const utils = require('./utils');
 const production = process.env.NODE_ENV === 'production';
 // 根目录
 const ROOTDIR = process.cwd();
-const entry = utils.getEntry(path.resolve(process.cwd(), 'src/pages/'));
-const pages = utils.getPages(path.resolve(process.cwd(), 'src/pages/'));
+const entry = utils.getEntry(path.resolve(ROOTDIR, 'src/pages/'));
+const pages = utils.getPages(path.resolve(ROOTDIR, 'src/pages/'));
 
 const makeWebpack = (options) => {
   let config = {
     entry: entry,
     output: {
-      path: path.resolve(process.cwd(), 'dist'),
+      path: path.resolve(ROOTDIR, 'dist'),
       filename: '[name].js'
     },
     module: {
@@ -28,6 +28,38 @@ const makeWebpack = (options) => {
           use: [{
             loader: 'ejs-loader'
           }]
+        },
+        {
+          test: /\.vue$/,
+          loader: 'vue-loader',
+          exclude: /node_modules/,
+          options: {
+            loaders: {
+              'scss': [
+                MiniCssExtractPlugin.loader,
+                {
+                  loader: 'vue-style-loader'
+                },
+                {
+                  loader: 'css-loader',
+                  options: {
+                    importLoaders: 1,
+                  }
+                },
+                {
+                  loader: 'postcss-loader',
+                  options: {
+                    plugins: () => [
+                      require('autoprefixer')
+                    ]
+                  }
+                },
+                {
+                  loader: 'sass-loader'
+                },
+              ]
+            }
+          }
         },
         {
           test: /\.jsx?$/,
@@ -76,6 +108,7 @@ const makeWebpack = (options) => {
           test: [/\.gif$/, /\.jpe?g$/, /\.png$/],
           loader: 'url-loader',
           options: {
+            name: '[name]-[hash:5].[ext]',
             limit: 10000, //1w字节以下大小的图片会自动转成base64
           },
         },
@@ -122,21 +155,45 @@ const makeWebpack = (options) => {
       })
     ].concat(pages),
     resolve: {
-      extensions: ['.js', '.json', ".css"]
+      extensions: ['.js', '.json'],
+      alias: {
+        '@': resolve('src')
+      }
     },
   }
 
   config.devtool = !production ? 'cheap-module-source-map' : 'null';
   config.output.filename = !production ? '[name].js' : '[name].js?v=[chunkhash:8]';
 
+  if (options) {
+    if (options.output) {
+      config.output = Object.assign({}, config.output, options.output)
+    }
+    if (options.module && options.module.rules) {
+      config.module.rules = config.module.rules.concat(options.module.rules)
+    }
+    if (options.plugins) {
+      config.plugins = config.plugins.concat(options.plugins)
+    }
+    if (options.resolve) {
+      if (options.resolve.extensions) {
+        config.resolve.extensions = config.resolve.extensions.concat(options.resolve.extensions)
+      }
+      if (options.resolve.alias) {
+        config.resolve.alias = Object.assign({}, config.resolve.alias, options.resolve.alias)
+      }
+    }
+  }
+
   if (!production) {
     config.plugins.push(new webpack.HotModuleReplacementPlugin());
     config.devServer = {
-      contentBase: path.resolve(process.cwd(), 'dist'),//本地服务器所加载的页面所在的目录
-      historyApiFallback: true,//不跳转
+      disableHostCheck: true,
+      contentBase: path.resolve(ROOTDIR, 'dist'),//本地服务器所加载的页面所在的目录
+      // historyApiFallback: true,//不跳转
       inline: true,//实时刷新
       hot: true,
-      port: 8081,
+      port: 8090,
       proxy: {
         '/api/*': {
           target: 'http://localhost:9090/',
@@ -147,6 +204,10 @@ const makeWebpack = (options) => {
   }
 
   return config;
+}
+
+function resolve(dir) {
+  return path.resolve(ROOTDIR, dir)
 }
 
 module.exports = makeWebpack;
