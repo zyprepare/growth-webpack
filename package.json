@@ -12,18 +12,18 @@
     "mock": "npx json-server --watch mock/db.json --routes mock/routes.json --port 9090",
     "lint": "npx eslint --ext .js src",
     "precp": "npm run build",
-    "cp": "cp -r dist/. ../test/dist"
+    "cp": "cp -r dist/. ../test/dist",
+    "prettier-watch": "onchange '**/*.js' -- prettier --write {{changed}}"
   },
-  "pre-commit": [
-    "lint"
-  ],
   "husky": {
     "hooks": {
-      "pre-commit": "lint-staged"
+      "pre-commit": "lint-staged",
+      "commit-msg": "commitlint -E HUSKY_GIT_PARAMS"
     }
   },
   "lint-staged": {
     "src/**/*.js": [
+      "eslint --ext .js src",
       "prettier --write",
       "git add"
     ]
@@ -35,6 +35,8 @@
     "url": "https://github.com/zyprepare/growth-webpack.git"
   },
   "devDependencies": {
+    "@commitlint/cli": "^8.0.0",
+    "@commitlint/config-conventional": "^8.0.0",
     "autoprefixer": "^8.5.1",
     "babel-core": "^6.26.3",
     "babel-eslint": "^8.2.3",
@@ -61,6 +63,7 @@
     "lint-staged": "^8.2.0",
     "mini-css-extract-plugin": "^0.4.0",
     "node-sass": "^4.9.0",
+    "onchange": "^6.0.0",
     "postcss-flexbugs-fixes": "^3.3.1",
     "postcss-loader": "^2.1.5",
     "pre-commit": "^1.2.2",
