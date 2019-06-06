@@ -3,5 +3,7 @@ export default function log(...args) {
     // eslint-disable-line no-undef
     console.log(...args); // eslint-disable-line no-console
   }
-  var a = function() {};
+  var a = function() {
+    var b;
+  };
 }
