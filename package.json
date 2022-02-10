@@ -62,7 +62,7 @@
     "json-server": "^0.12.2",
     "lint-staged": "^8.2.0",
     "mini-css-extract-plugin": "^0.4.0",
-    "node-sass": "^4.9.0",
+    "node-sass": "^7.0.0",
     "onchange": "^6.0.0",
     "postcss-flexbugs-fixes": "^3.3.1",
     "postcss-loader": "^2.1.5",
